@@ -30,7 +30,7 @@ async function loadJsonModel() {
 }
 
 function tick() {
-    setTimeout(tick, 200);
+    setTimeout(tick, 300);
     visitCell();
     displayBoard();
     checkGoal();
