@@ -1,0 +1,96 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: var(--background-color);
+}
+
+:root {
+    --cell-size: 80px; 
+    --background-color: #948383; 
+    --cell-border-color: #4747477c;
+    --cell-background-color: #363d272c;
+    --player-color: #535fc9;
+    --goal-color: #F44336;
+    --trace-color: #cebf3e8f;
+}
+
+.cell {
+    box-sizing: border-box;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background-color: var(--cell-background-color);
+    border-style: solid;
+    border-width: 0;
+    border-color: black;
+}
+
+.top-wall {
+    border-top-width: 3px;
+}
+
+.right-wall {
+    border-right-width: 3px;
+}
+
+.bottom-wall {
+    border-bottom-width: 3px;
+}
+
+.left-wall {
+    border-left-width: 3px;
+}
+
+#board {
+    margin-top: 5%;
+    margin-bottom: 2%;
+    display: grid;
+    grid-template-columns: repeat(var(--GRID-WIDTH), var(--cell-size));
+    justify-content: center;
+    background-color: var(--background-color);
+    padding: 1px;
+}
+
+.player::before {
+    content: "";
+    display: block;
+    width: 50%;
+    height: 50%;
+    background-color: var(--player-color);
+    border-radius: 50%;
+    position: relative;
+    top: 25%;
+    left: 25%;
+    box-shadow: 0 0 10px var(--player-color), 0 0 20px var(--player-color);
+    animation: pulse 2s infinite;
+}
+
+.trace {
+    background-color: var(--trace-color);
+    box-shadow: 0 0 10px var(--trace-color), 0 0 20px var(--trace-color);
+    animation: pulse 2s infinite;
+}
+.goal::before {
+    content: "";
+    display: block;
+    width: 50%;
+    height: 50%;
+    background-color: var(--goal-color);
+    border-radius: 50%;
+    position: relative;
+    top: 25%;
+    left: 25%;
+    box-shadow: 0 0 10px var(--goal-color), 0 0 20px var(--goal-color);
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
