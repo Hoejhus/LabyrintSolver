@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Labyrinth Generator</title>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+<body>
+    <div class="generator-box">
+        <div class="input-box">
+            <input type="number" placeholder="Rows:" id="rows" name="rows" min="1">
+        </div>
+        <div class="input-box">
+            <input type="number" placeholder="Columns:" id="cols" name="cols" min="1">
+        </div>
+        <button id="generate">Generate Maze</button>
+    </div>
+    <div id="board"></div>
+    <div id="mazeData"></div>
+    <button id="copyButton">Copy Maze Data</button>
+    <script type="module" src="script.js"></script>
+</body>
+</html>

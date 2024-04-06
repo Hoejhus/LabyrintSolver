@@ -1,0 +1,140 @@
+body {
+    background: linear-gradient(to right, #12c2e9, #c471ed, #f64f59);
+    font-family: Arial, sans-serif;
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.input-box {
+    margin-bottom: 10px;
+}
+
+label {
+    margin-right: 10px;
+}
+
+input[type="number"] {
+    padding: 5px;
+    border: none;
+    border-radius: 5px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #f64f59;
+    color: #fff;
+}
+
+.generator-box {
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    max-width: 600px;
+    width: 200px;
+}
+
+:root {
+    --cell-size: 40px; 
+    --background-color: #948383; 
+    --cell-border-color: #4747477c;
+    --cell-background-color: #363d272c;
+    --player-color: #535fc9;
+    --goal-color: #F44336;
+    --trace-color: #cebf3e8f;
+}
+
+.cell {
+    box-sizing: border-box;
+    width: var(--cell-size);
+    height: var(--cell-size);
+    background-color: var(--cell-background-color);
+    border-style: solid;
+    border: 3px solid transparent;
+    border-color: rgba(0, 0, 0, 0.137)
+}
+
+.top-wall {
+    border-top: 3px solid black;
+}
+
+.right-wall {
+    border-right: 3px solid black;
+}
+
+.bottom-wall {
+    border-bottom: 3px solid black;
+}
+
+.left-wall {
+    border-left: 3px solid black;
+}
+
+#board {
+    display: grid;
+    grid-template-columns: repeat(var(--GRID-WIDTH), var(--cell-size));
+    justify-content: center;
+    margin-top: 20px;
+    padding: 1px;
+    width: calc(var(--cell-size) * var(--GRID-WIDTH));
+    max-width: 100%;
+}
+
+#mazeData {
+    width: 90%;
+    max-height: 200px; 
+    overflow-y: auto;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: #000;
+    border-radius: 10px; 
+    padding: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    font-family: 'Courier New', Courier, monospace; 
+    margin-top: 20px;
+    border: 2px solid #f64f59;
+    box-sizing: border-box;
+}
+
+
+#mazeData > pre {
+    margin: 0;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+#copyButton {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    background-color: #fff;
+    color: #333;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-top: 10px;
+}
+
+#copyButton:hover {
+    background-color: #f64f59;
+    color: #fff;
+}
