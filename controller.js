@@ -1,5 +1,4 @@
-import { createModel, route, readFromCell, writeToCell, model } from "./model.js";
-import { createView, displayBoard, parseModel } from "./view.js";
+import { createView, parseModel } from "./view.js";
 
 "use strict";
 
@@ -7,13 +6,13 @@ window.addEventListener("load", start);
 
 export let GRID_HEIGHT = null;
 export let GRID_WIDTH = null;
+export let route = [];
 let jsonModelData = null;
 
 async function start() {
     console.log("Labyrint Solver Running...");
     jsonModelData = await loadJsonModel();
     createView();
-    createModel();
     parseModel(jsonModelData);
     route.push(jsonModelData.start);
     tick();
@@ -22,7 +21,7 @@ async function start() {
 
     // Load JSON Maze model
 async function loadJsonModel() {
-    const response = await fetch("maze.json");
+    const response = await fetch("maze1.json");
     const json = await response.json();
     GRID_HEIGHT = json.rows;
     GRID_WIDTH = json.cols;
@@ -30,105 +29,119 @@ async function loadJsonModel() {
 }
 
 function tick() {
-    setTimeout(tick, 300);
+    setTimeout(tick, 100);
     visitCell();
-    displayBoard();
     checkGoal();
 }
 
-    // Player logic to move through the maze + update player view.
 function visitCell() {
-    let cells = document.querySelectorAll("#board .cell");
-    let currentCell = route[route.length - 1];
-    let cellElement;
+    let currentCell = route.at(-1);
 
-    // Find the cell element in the view
-    for (let i = 0; i < cells.length; i++) {
-        if (cells[i].dataset.row == currentCell.row && cells[i].dataset.col == currentCell.col) {
-            cellElement = cells[i];
+    if (!tryMoveFromCell(currentCell, null)) {
+        console.log("Dead end, attempting to backtrack and find new paths...");
+        tryBacktrackAndMove();
+    }
+}
+
+    // Backtracking to previous
+function tryBacktrackAndMove() {
+    while (route.length > 1) {
+        let lastCell = route.pop();
+        let currentCell = route.at(-1);
+        
+        updatePlayerPosition(lastCell, currentCell);
+
+        if (tryMoveFromCell(currentCell, lastCell)) {
+            console.log(`Found new path after backtracking to cell: Row ${currentCell.row}, Col ${currentCell.col}`);
             break;
         }
     }
+}
 
-    let hasTopWall = cellElement.classList.contains("top-wall");
-    let hasRightWall = cellElement.classList.contains("right-wall");
-    let hasBottomWall = cellElement.classList.contains("bottom-wall");
-    let hasLeftWall = cellElement.classList.contains("left-wall");
+function tryMoveFromCell(currentCell, lastCell) {
+    let cellElement = document.querySelector(`#board .cell[data-row="${currentCell.row}"][data-col="${currentCell.col}"]`);
+    const directions = [
+        { name: 'right', wall: 'right-wall', row: 0, col: 1 },
+        { name: 'bottom', wall: 'bottom-wall', row: 1, col: 0 },
+        { name: 'left', wall: 'left-wall', row: 0, col: -1 },
+        { name: 'top', wall: 'top-wall', row: -1, col: 0 },
+    ];
 
-    console.log(`Cell at row ${currentCell.row}, col ${currentCell.col} has top wall: ${hasTopWall}, right wall: ${hasRightWall}, bottom wall: ${hasBottomWall}, left wall: ${hasLeftWall}`);
-
-    // Check if the player can move in any direction
-    if (route.length > 1) {
-        let previousCell = route[route.length - 2];
-        if (previousCell.row == currentCell.row && previousCell.col == currentCell.col + 1) {
-            hasRightWall = true;
-        }
-        else if (previousCell.row == currentCell.row && previousCell.col == currentCell.col - 1) {
-            hasLeftWall = true;
-        }
-        else if (previousCell.row == currentCell.row + 1 && previousCell.col == currentCell.col) {
-            hasBottomWall = true;
-        }
-        else if (previousCell.row == currentCell.row - 1 && previousCell.col == currentCell.col) {
-            hasTopWall = true;
-        }
-    }
-    if (!hasRightWall) {
-        let nextCell = { row: currentCell.row, col: currentCell.col + 1 };
-        route.push(nextCell);
-    }
-    else if (!hasBottomWall) {
-        let nextCell = { row: currentCell.row + 1, col: currentCell.col };
-        route.push(nextCell);
-    }
-    else if (!hasLeftWall) {
-        let nextCell = { row: currentCell.row, col: currentCell.col - 1 };
-        route.push(nextCell);
-    }
-    else if (!hasTopWall) {
-        let nextCell = { row: currentCell.row - 1, col: currentCell.col };
-        route.push(nextCell);
-    }
-    else {
-        route.pop();
-    }
-
-    // Update the player's position in the model
-    writeToCell(currentCell.row, currentCell.col, 0); // Remove player from old position
-    let newCell = route[route.length - 1];
-    if (readFromCell(newCell.row, newCell.col) != 2) { // Don't overwrite the goal
-    writeToCell(newCell.row, newCell.col, 1); // Add player to new position
-    }
-
-    // Update the view with trace behind each step
-    let oldCellElement;
-    for (let i = 0; i < cells.length; i++) {
-        if (cells[i].dataset.row == currentCell.row && cells[i].dataset.col == currentCell.col) {
-            oldCellElement = cells[i];
-            break;
+    for (let i = 0; i < directions.length; i++) {
+        let direction = directions[i];
+        if (!cellElement.classList.contains(direction.wall)) {
+            let nextCell = { row: currentCell.row + direction.row, col: currentCell.col + direction.col };
+    
+            if ((lastCell && nextCell.row === lastCell.row && nextCell.col === lastCell.col) || isCellVisited(nextCell)) {
+                continue;
+            }
+    
+            route.push(nextCell);
+            console.log(`Moving to cell: Row ${nextCell.row}, Col ${nextCell.col}`);
+            updatePlayerPosition(currentCell, nextCell);
+            return true;
         }
     }
+
+    return false;
+}
+
+function isCellVisited(nextCell) {
+    for (let i = 0; i < route.length; i++) {
+        if (route[i].row === nextCell.row && route[i].col === nextCell.col) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function updatePlayerPosition(oldCell, newCell) {
+    movePlayerToNewCell(newCell);
+    if (oldCell !== newCell) {
+        markOldCellAsVisited(oldCell);
+    }
+}
+
+function movePlayerToNewCell(newCell) {
+    const newCellElement = getCellElement(newCell);
+    newCellElement.classList.add("player");
+}
+
+function markOldCellAsVisited(oldCell) {
+    const oldCellElement = getCellElement(oldCell);
+    oldCellElement.classList.remove("player");
     oldCellElement.classList.add("trace");
 }
 
+function getCellElement(cell) {
+    const selector = `#board .cell[data-row="${cell.row}"][data-col="${cell.col}"]`;
+    return document.querySelector(selector);
+}
+
+async function resetGame() {
+    console.log("Resetting game...");
+    route.length = 0;
+
+    const cells = document.querySelectorAll("#board .cell");
+    cells.forEach(cell => {
+        cell.classList.remove("player", "trace");
+    });
+    createView();
+    parseModel(jsonModelData);
+    route.push(jsonModelData.start);
+}
+
 function checkGoal() {
-    let currentCell = route[route.length - 1];
+    let currentCell = route.at(-1);
 
     if (currentCell.row == jsonModelData.goal.row && currentCell.col == jsonModelData.goal.col) {
-
-        // Highlight the goal cell
-        let cells = document.querySelectorAll("#board .cell");
-        let cellElement;
-        for (let i = 0; i < cells.length; i++) {
-            if (cells[i].dataset.row == jsonModelData.goal.row && cells[i].dataset.col == jsonModelData.goal.col) {
-                cellElement = cells[i];
-                break;
-            }
-        }
+        // Goal cell
+        let cellElement = document.querySelector(`#board .cell[data-row="${jsonModelData.goal.row}"][data-col="${jsonModelData.goal.col}"]`);
         cellElement.classList.add("trace");
         cellElement.classList.remove("player");
         setTimeout(() => {
             alert("Congratulations! You reached the goal!");
+            resetGame();
         }, 200);
     }
-} 
+}

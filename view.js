@@ -1,4 +1,3 @@
-import {readFromCell, writeToCellWallData } from "./model.js";
 import {GRID_HEIGHT, GRID_WIDTH} from "./controller.js";
 
 export function createView() {
@@ -13,28 +12,6 @@ export function createView() {
             cell.dataset.col = col;
             board.appendChild(cell);
             console.log("Cell created: " + row + ", " + col);
-        }
-    }
-}
-
-export function displayBoard() {
-    const cells = document.querySelectorAll("#board .cell");
-
-    for (let row = 0; row < GRID_HEIGHT; row++) {
-        for (let col = 0; col < GRID_WIDTH; col++) {
-            const index = row * GRID_WIDTH + col;
-  
-            switch (readFromCell(row, col)) {
-                case 0:
-                cells[index].classList.remove("player", "goal");
-                break;
-                case 1:
-                cells[index].classList.add("player");
-                break;
-                case 2:
-                cells[index].classList.add("goal");
-                break;
-            }
         }
     }
 }
@@ -71,8 +48,6 @@ export function parseModel(jsonModelData) {;
             if (row === goal.row && col === goal.col) {
                 cell.classList.add("goal");
             }
-
-            writeToCellWallData(row, col, cellData);
             console.log("Cell data written: " + row + ", " + col + ": " + JSON.stringify(cellData));
         }
     }
