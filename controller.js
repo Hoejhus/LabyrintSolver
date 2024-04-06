@@ -21,7 +21,7 @@ async function start() {
 
     // Load JSON Maze model
 async function loadJsonModel() {
-    const response = await fetch("maze1.json");
+    const response = await fetch("maze.json");
     const json = await response.json();
     GRID_HEIGHT = json.rows;
     GRID_WIDTH = json.cols;
